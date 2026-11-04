@@ -35,29 +35,33 @@
     .hero { position: relative; text-align: center; padding: 0 108px 14px; }
     .brand-name {
       margin: 0;
-      font-family: "Bodoni 72", Didot, "Bodoni MT", "Times New Roman", serif;
-      font-size: clamp(66px, 8.2vw, 132px);
+      font-family: Didot, "Bodoni 72", "Bodoni MT", "Bodoni 72 Smallcaps", "Times New Roman", serif;
+      font-size: clamp(70px, 7.5vw, 122px);
       font-style: italic;
       font-weight: 400;
-      letter-spacing: -0.065em;
-      line-height: .82;
+      font-synthesis: none;
+      letter-spacing: -0.058em;
+      line-height: .86;
     }
     .brand-subtitle {
-      margin: 16px 0 26px;
-      font-family: "Bodoni 72", Didot, "Bodoni MT", Georgia, serif;
-      font-size: clamp(13px, 1.5vw, 23px);
-      font-weight: 500;
-      letter-spacing: .31em;
+      margin: 17px 0 25px;
+      font-family: Didot, "Bodoni 72", "Bodoni MT", Georgia, serif;
+      font-size: clamp(13px, 1.25vw, 20px);
+      font-weight: 400;
+      font-synthesis: none;
+      letter-spacing: .34em;
       line-height: 1.2;
     }
     .hero h2 {
-      max-width: 980px;
+      max-width: 930px;
       margin: 0 auto;
       font-family: Georgia, "Times New Roman", serif;
-      font-size: clamp(31px, 3.35vw, 57px);
-      line-height: .94;
-      letter-spacing: -.045em;
+      font-size: clamp(32px, 3.05vw, 50px);
+      font-weight: 700;
+      line-height: .92;
+      letter-spacing: -.04em;
     }
+    .hero h2 .question-line { display: block; }
     .hero-copy { margin: 17px 0 0; font-size: 14px; color: #30353a; }
     .year-badge {
       position: absolute;
@@ -186,10 +190,10 @@
     .results-card { display: flex; min-width: 0; flex-direction: column; overflow: hidden; }
     .results-head { padding: 22px 22px 14px; border-bottom: 1px solid var(--line); }
     .results-title-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
-    .results-title { margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: 33px; line-height: 1; letter-spacing: -.04em; }
+    .results-title { margin: 0; font-family: Didot, "Bodoni 72", "Bodoni MT", Georgia, serif; font-size: 34px; font-weight: 400; font-synthesis: none; line-height: .94; letter-spacing: -.035em; white-space: nowrap; }
     .live-pill { display: inline-flex; align-items: center; gap: 5px; padding: 5px 8px; border-radius: 999px; color: #257f54; background: #e8f7ee; font-size: 8px; font-weight: 800; letter-spacing: .08em; }
     .live-pill::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: #2aaf6e; box-shadow: 0 0 0 3px rgba(42,175,110,.12); }
-    .results-kicker { margin: 6px 0 4px; font-family: "Segoe Print", "Bradley Hand", cursive; font-size: 14px; font-style: italic; font-weight: 700; }
+    .results-kicker { margin: 8px 0 7px; font-family: "Bradley Hand", "Segoe Print", "Comic Sans MS", cursive; font-size: 15px; font-style: normal; font-weight: 700; line-height: 1.05; }
     .results-count { margin: 0; color: #6d737b; font-size: 9px; }
     .count-track { height: 5px; margin: 10px 0 13px; overflow: hidden; border-radius: 999px; background: #e6e5e3; }
     .count-fill { width: 0; height: 100%; border-radius: inherit; background: var(--ink); transition: width .35s ease; }
@@ -261,6 +265,8 @@
     @media (max-width: 690px) {
       .page-shell { width: calc(100% - 16px); }
       .hero h2 { font-size: clamp(28px, 9vw, 43px); line-height: .98; }
+      .hero h2 .question-line { display: inline; }
+      .hero h2 .question-line::after { content: " "; }
       .brand-name { font-size: clamp(54px, 19vw, 87px); }
       .brand-subtitle { margin-bottom: 20px; font-size: 11px; letter-spacing: .21em; }
       .hero-copy { font-size: 12px; }
@@ -288,7 +294,7 @@
       .action-grid { grid-template-columns: 1fr; }
       .perspective-wrap { text-align: center; }
       .vote-area { grid-column: auto; }
-      .results-title { font-size: 30px; }
+      .results-title { font-size: 36px; }
     }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
@@ -305,7 +311,7 @@
       </div>
       <h1 class="brand-name">Pantone Posse</h1>
       <p class="brand-subtitle">THE 2027 COLOR CHALLENGE</p>
-      <h2>What color family do you think Pantone<br>will choose for its 2027 Color of the Year?</h2>
+      <h2><span class="question-line">What color family do you think</span><span class="question-line">Pantone</span><span class="question-line">will choose for its 2027 Color of the</span><span class="question-line">Year?</span></h2>
       <p class="hero-copy">Take a guess, spark a debate, and see what your color colleagues think! 🎨</p>
     </header>
 
