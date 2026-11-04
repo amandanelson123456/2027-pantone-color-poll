@@ -312,7 +312,7 @@
     renderFilters();renderPalette();fillHotChoices();renderResults();updateSubmit();
 
     try{
-      const [{initializeApp},{getAuth,signInAnonymously,onAuthStateChanged},{getFirestore,collection,doc,getDoc,setDoc,onSnapshot,serverTimestamp}] = await Promise.all([
+      const [{initializeApp},{getAuth,signInAnonymously,onAuthStateChanged},{getFirestore,collection,doc,getDoc,getDocs,setDoc,onSnapshot,serverTimestamp}] = await Promise.all([
         import("https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js"),
         import("https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js"),
         import("https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js")
@@ -320,7 +320,11 @@
       const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app);
       onAuthStateChanged(auth,async user=>{authUser=user;if(!user){updateSubmit();return;}const existing=await getDoc(doc(db,"votes",user.uid));alreadyVoted=existing.exists();updateSubmit();});
       if(!auth.currentUser) await signInAnonymously(auth);
-      onSnapshot(collection(db,"votes"),snap=>{votes=snap.docs.filter(d=>!d.metadata.hasPendingWrites).map(d=>({id:d.id,...d.data()}));renderResults();},err=>{console.error(err);status.textContent="Live results could not load ("+(err.code||"error")+").";resultsBody.innerHTML='<div class="empty-state"><strong>Results couldn\u2019t load.</strong><span>'+escapeHtml(err.code||err.message||"Please refresh.")+'</span></div>';});
+      const votesRef=collection(db,"votes");
+      const setVotes=snap=>{votes=snap.docs.map(d=>({id:d.id,...d.data()}));renderResults();};
+      const listenErr=err=>{console.error(err);status.textContent="Live results could not load ("+(err.code||"error")+").";resultsBody.innerHTML='<div class="empty-state"><strong>Results couldn\u2019t load.</strong><span>'+escapeHtml(err.code||err.message||"Please refresh.")+'</span></div>';};
+      getDocs(votesRef).then(setVotes).catch(listenErr);
+      onSnapshot(votesRef,{includeMetadataChanges:true},snap=>{if(snap.metadata.fromCache&&snap.empty)return;setVotes(snap);},listenErr);
       submit.addEventListener("click",async()=>{
         if(submit.disabled||!authUser)return;
         const name=nameInput.value.trim(),isOther=selected===42,customName=document.getElementById("customName").value.trim();
@@ -331,7 +335,7 @@
         const customHot=hot==="other"?hotCustom.value.trim():"";
         if(hot==="other"&&!customHot){status.textContent="Please name your worst-case color.";submit.disabled=false;return;}
         const payload={name,color:isOther?"other":selected,customColor:isOther?customName:"",hotColor:hot,hotCustomColor:customHot,comment:document.getElementById("comment").value.trim(),createdAt:new Date().toISOString(),paletteVersion:2};
-        try{await setDoc(doc(db,"votes",authUser.uid),payload);alreadyVoted=true;status.textContent="Your prediction is in!";showToast("Your prediction is in!");}
+        try{await setDoc(doc(db,"votes",authUser.uid),payload);alreadyVoted=true;status.textContent="Your prediction is in!";try{setVotes(await getDocs(votesRef));}catch(e){console.error(e);}showToast("Your prediction is in!");}
         catch(err){console.error(err);status.textContent="Vote not saved: "+(err.code||err.message||"unknown error")+".";showToast("Vote not saved: "+(err.code||"error"));submit.disabled=false;}
       });
     }catch(err){console.error(err);status.textContent="Could not connect to the live poll. Please refresh.";}
