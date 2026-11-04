@@ -329,7 +329,7 @@
         if(hot==="other"&&!customHot){status.textContent="Please name your worst-case color.";submit.disabled=false;return;}
         const payload={name,color:isOther?"other":selected,customColor:isOther?customName:"",hotColor:hot,hotCustomColor:customHot,comment:document.getElementById("comment").value.trim(),createdAt:new Date().toISOString(),paletteVersion:2};
         try{await setDoc(doc(db,"votes",authUser.uid),payload);alreadyVoted=true;status.textContent="Your prediction is in!";showToast("Your prediction is in!");}
-        catch(err){console.error(err);status.textContent="Could not save your vote. Please refresh and try again.";submit.disabled=false;}
+        catch(err){console.error(err);status.textContent="Vote not saved: "+(err.code||err.message||"unknown error")+". Check Firebase permissions.";submit.disabled=false;}
       });
     }catch(err){console.error(err);status.textContent="Could not connect to the live poll. Please refresh.";}
   </script>
