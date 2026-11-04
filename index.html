@@ -327,14 +327,18 @@
       onSnapshot(votesRef,{includeMetadataChanges:true},snap=>{if(snap.metadata.fromCache&&snap.empty)return;setVotes(snap);},listenErr);
       submit.addEventListener("click",async()=>{
         if(submit.disabled||!authUser)return;
-        const name=nameInput.value.trim(),isOther=selected===42,customName=document.getElementById("customName").value.trim();
+        const name=nameInput.value.trim().slice(0,40),isOther=selected===42,customName=document.getElementById("customName").value.trim().slice(0,50);
         if(isOther&&!customName){status.textContent="Please name your custom color.";return;}
+        if(!name||name.length<1){status.textContent="Please enter your name.";return;}
         submit.disabled=true;status.textContent="Saving your prediction…";
         const hotChoice=Number(hotSelect.value);
         const hot=hotChoice===-1?"":hotChoice===42?"other":hotChoice;
-        const customHot=hot==="other"?hotCustom.value.trim():"";
+        const customHot=hot==="other"?hotCustom.value.trim().slice(0,50):"";
         if(hot==="other"&&!customHot){status.textContent="Please name your worst-case color.";submit.disabled=false;return;}
-        const payload={name,color:isOther?"other":selected,customColor:isOther?customName:"",hotColor:hot,hotCustomColor:customHot,comment:document.getElementById("comment").value.trim(),createdAt:new Date().toISOString(),paletteVersion:2};
+        const comment=document.getElementById("comment").value.trim().slice(0,140);
+        const createdAt=new Date().toISOString();
+        const payload={name,color:isOther?"other":selected,customColor:isOther?customName:"",hotColor:hot,hotCustomColor:customHot,comment,createdAt,paletteVersion:2};
+        console.log("Submitting vote payload:",payload,"uid:",authUser.uid);
         try{await setDoc(doc(db,"votes",authUser.uid),payload);alreadyVoted=true;status.textContent="Your prediction is in!";try{setVotes(await getDocs(votesRef));}catch(e){console.error(e);}showToast("Your prediction is in!");}
         catch(err){console.error(err);status.textContent="Vote not saved: "+(err.code||err.message||"unknown error")+".";showToast("Vote not saved: "+(err.code||"error"));submit.disabled=false;}
       });
