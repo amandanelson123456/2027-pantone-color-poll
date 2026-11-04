@@ -323,7 +323,7 @@
         if(isOther&&!customName){status.textContent="Please name your custom color.";return;}
         submit.disabled=true;status.textContent="Saving your prediction…";
         const hot=Number(hotSelect.value);
-        const payload={name,color:selected,customColor:isOther?customName:"",hotColor:hot,hotCustomColor:hot===42?hotCustom.value.trim():"",comment:document.getElementById("comment").value.trim(),createdAt:serverTimestamp(),paletteVersion:2};
+        const payload={name,color:selected,customColor:isOther?customName:"",hotColor:hot,hotCustomColor:hot==="other"?hotCustom.value.trim():"",comment:document.getElementById("comment").value.trim(),createdAt:new Date().toISOString(),paletteVersion:2};
         try{await setDoc(doc(db,"votes",authUser.uid),payload);alreadyVoted=true;status.textContent="Your prediction is in!";showToast("Your prediction is in!");}
         catch(err){console.error(err);status.textContent="Could not save your vote. Please refresh and try again.";submit.disabled=false;}
       });
