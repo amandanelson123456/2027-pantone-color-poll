@@ -291,13 +291,14 @@
     function showToast(message){toast.textContent=message;toast.classList.add("show");setTimeout(()=>toast.classList.remove("show"),2600);}
     function escapeHtml(v){return String(v??"").replace(/[&<>'"]/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[ch]));}
     function choiceFor(v,field="color"){
-      const idx=Number(v[field]);
-      if(idx===42){const label=v[field==="color"?"customColor":"hotCustomColor"]||"Custom color";return {label:`Other — ${label}`,hex:v.customHex||"#8d6ed7"};}
+      const raw=v[field];
+      const idx=Number(raw);
+      if(raw==="other"||idx===42){const label=v[field==="color"?"customColor":"hotCustomColor"]||"Custom color";return {label:`Other — ${label}`,hex:v.customHex||"#8d6ed7"};}
       return colors[idx]?{label:`${colors[idx].code} — ${colors[idx].name}`,hex:colors[idx].hex}:{label:"Unknown choice",hex:"#ddd"};
     }
     function renderResults(){
       count.textContent=`${votes.length} prediction${votes.length===1?'':'s'} submitted`;
-      const source=activeTab==="predictions"?votes:votes.filter(v=>Number(v.hotColor)>=0);
+      const source=activeTab==="predictions"?votes:votes.filter(v=>v.hotColor!==""&&v.hotColor!==-1&&v.hotColor!==null&&v.hotColor!==undefined);
       if(!source.length){resultsBody.innerHTML='<div class="empty-state"><strong>Be the first to choose.</strong><span>The palette is ready for the Posse.</span></div>';return;}
       const field=activeTab==="predictions"?"color":"hotColor";
       const grouped=new Map();source.forEach(v=>{const choice=choiceFor(v,field);const key=choice.label;const group=grouped.get(key)||{choice,count:0,names:[]};group.count++;group.names.push(v.name);grouped.set(key,group);});
@@ -322,8 +323,11 @@
         const name=nameInput.value.trim(),isOther=selected===42,customName=document.getElementById("customName").value.trim();
         if(isOther&&!customName){status.textContent="Please name your custom color.";return;}
         submit.disabled=true;status.textContent="Saving your prediction…";
-        const hot=Number(hotSelect.value);
-        const payload={name,color:selected,customColor:isOther?customName:"",hotColor:hot,hotCustomColor:hot==="other"?hotCustom.value.trim():"",comment:document.getElementById("comment").value.trim(),createdAt:new Date().toISOString(),paletteVersion:2};
+        const hotChoice=Number(hotSelect.value);
+        const hot=hotChoice===-1?"":hotChoice===42?"other":hotChoice;
+        const customHot=hot==="other"?hotCustom.value.trim():"";
+        if(hot==="other"&&!customHot){status.textContent="Please name your worst-case color.";submit.disabled=false;return;}
+        const payload={name,color:isOther?"other":selected,customColor:isOther?customName:"",hotColor:hot,hotCustomColor:customHot,comment:document.getElementById("comment").value.trim(),createdAt:new Date().toISOString(),paletteVersion:2};
         try{await setDoc(doc(db,"votes",authUser.uid),payload);alreadyVoted=true;status.textContent="Your prediction is in!";showToast("Your prediction is in!");}
         catch(err){console.error(err);status.textContent="Could not save your vote. Please refresh and try again.";submit.disabled=false;}
       });
